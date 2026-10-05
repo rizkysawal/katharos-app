@@ -1,2 +1,3 @@
 db_data/
 backend_upload/
+.env
