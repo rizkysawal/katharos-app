@@ -1,0 +1,25 @@
+networks:
+  katharos_net:
+    driver: bridge
+services:
+  database:
+    container_name: katharos_db
+    environment:
+      POSTGRES_DB: katharos_db
+      POSTGRES_PASSWORD: SecretPasswordGantiDisini123!
+      POSTGRES_USER: katharos_user
+    image: postgres:16-alpine
+    networks:
+      - katharos_net
+    restart: unless-stopped
+    volumes:
+      - /mnt/HDD2TB-Dual/AppData/katharos/db_data:/var/lib/postgresql/data
+  frontend:
+    container_name: katharos_frontend
+    image: nginx:alpine
+    networks:
+      - katharos_net
+    ports:
+      - '3001:80'
+    restart: unless-stopped
+version: '3.8'
