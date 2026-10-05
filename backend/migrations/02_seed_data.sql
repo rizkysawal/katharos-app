@@ -180,7 +180,7 @@ BEGIN
     (ch_gen1_tb, 29, 'Berfirmanlah Allah: "Lihatlah, Aku memberikan kepadamu segala tumbuh-tumbuhan yang berbiji di seluruh bumi dan segala pohon-pohonan yang buahnya berbiji; itulah akan menjadi makananmu.'),
     (ch_gen1_tb, 30, 'Tetapi kepada segala binatang di bumi dan segala burung di udara dan segala yang merayap di bumi, yang bernyawa, Kuberikan segala tumbuh-tumbuhan hijau menjadi makanannya." Dan jadilah demikian.'),
     (ch_gen1_tb, 31, 'Maka Allah melihat segala yang dijadikan-Nya itu, sungguh amat baik. Jadilah petang dan jadilah pagi, itulah hari keenam.')
-    ON CONFLICT (chapter_id, verse_number) DO UPDATE SET text = EXCLUDED.text;
+    ON CONFLICT (chapter_id, verse_number) DO NOTHING;
 
     -- Verses for Kejadian 2 (TB)
     INSERT INTO verses (chapter_id, verse_number, text) VALUES
@@ -188,7 +188,7 @@ BEGIN
     (ch_gen2_tb, 2, 'Ketika Allah pada hari ketujuh telah menyelesaikan pekerjaan yang dibuat-Nya itu, berhentilah Ia pada hari ketujuh dari segala pekerjaan yang telah dibuat-Nya itu.'),
     (ch_gen2_tb, 3, 'Lalu Allah memberkati hari ketujuh itu dan menguduskannya, karena pada hari itulah Ia berhenti dari segala pekerjaan penciptaan yang telah dibuat-Nya itu.'),
     (ch_gen2_tb, 4, 'Demikianlah riwayat langit dan bumi pada waktu diciptakan.')
-    ON CONFLICT (chapter_id, verse_number) DO UPDATE SET text = EXCLUDED.text;
+    ON CONFLICT (chapter_id, verse_number) DO NOTHING;
 
     -- Verses for Yohanes 1 (TB)
     INSERT INTO verses (chapter_id, verse_number, text) VALUES
@@ -210,7 +210,7 @@ BEGIN
     (ch_jhn1_tb, 16, 'Karena dari kelimpahan-Nya kita semua telah menerima kasih karunia demi kasih karunia;'),
     (ch_jhn1_tb, 17, 'sebab hukum Taurat diberikan oleh Musa, tetapi kasih karunia dan kebenaran datang oleh Yesus Kristus.'),
     (ch_jhn1_tb, 18, 'Tidak seorangpun yang pernah melihat Allah; tetapi Anak Tunggal Allah, yang ada di pangkuan Bapa, Dialah yang menyatakan-Nya.')
-    ON CONFLICT (chapter_id, verse_number) DO UPDATE SET text = EXCLUDED.text;
+    ON CONFLICT (chapter_id, verse_number) DO NOTHING;
 
     -- Verses for Genesis 1 (KJV)
     INSERT INTO verses (chapter_id, verse_number, text) VALUES
@@ -219,7 +219,7 @@ BEGIN
     (ch_gen1_kjv, 3, 'And God said, Let there be light: and there was light.'),
     (ch_gen1_kjv, 4, 'And God saw the light, that it was good: and God divided the light from the darkness.'),
     (ch_gen1_kjv, 5, 'And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day.')
-    ON CONFLICT (chapter_id, verse_number) DO UPDATE SET text = EXCLUDED.text;
+    ON CONFLICT (chapter_id, verse_number) DO NOTHING;
 
     -- Verses for John 1 (KJV)
     INSERT INTO verses (chapter_id, verse_number, text) VALUES
@@ -228,6 +228,6 @@ BEGIN
     (ch_jhn1_kjv, 3, 'All things were made by him; and without him was not any thing made that was made.'),
     (ch_jhn1_kjv, 4, 'In him was life; and the life was the light of men.'),
     (ch_jhn1_kjv, 5, 'And the light shineth in darkness; and the darkness comprehended it not.')
-    ON CONFLICT (chapter_id, verse_number) DO UPDATE SET text = EXCLUDED.text;
+    ON CONFLICT (chapter_id, verse_number) DO NOTHING;
 
 END $$;
