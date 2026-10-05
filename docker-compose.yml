@@ -12,17 +12,51 @@ services:
     networks:
       - katharos_net
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-katharos_db}
+      POSTGRES_USER: ${POSTGRES_USER:-katharos_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-katharos_secret}
+    ports:
+      - "5432:5432"
     volumes:
-      - /mnt/HDD2TB-Dual/AppData/katharos/db_data:/var/lib/postgresql/data
+      # Supports custom host path (like TrueNAS: /mnt/HDD2TB-Dual/AppData/katharos/db_data) or Docker volume
+      - ${DB_DATA_PATH:-katharos_db_data}:/var/lib/postgresql/data
+      # Auto-run SQL schema & seed on container first start
+      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: katharos_backend
+    restart: unless-stopped
+    networks:
+      - katharos_net
+    environment:
+      PORT: 8080
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-katharos_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-katharos_secret}
+      DB_NAME: ${POSTGRES_DB:-katharos_db}
+      DB_SSLMODE: disable
+      CORS_ALLOWED_ORIGINS: "*"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
 
   frontend:
-    image: nginx:alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: katharos_frontend
     restart: unless-stopped
     networks:
       - katharos_net
     ports:
-      - '3001:80'
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  katharos_db_data:

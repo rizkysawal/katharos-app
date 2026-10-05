@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #fcfcfc;
+    --bg-card: #ffffff;
+    --text-primary: #1c1917;
+    --text-secondary: #78716c;
+    --border-color: #e7e5e4;
+  }
+
+  .theme-sepia {
+    --bg-primary: #fbf7ee;
+    --bg-card: #f4ecdc;
+    --text-primary: #3d2f1f;
+    --text-secondary: #7f6d57;
+    --border-color: #e4d8c1;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  .dark {
+    --bg-primary: #121212;
+    --bg-card: #1e1e1e;
+    --text-primary: #e7e5e4;
+    --text-secondary: #a8a29e;
+    --border-color: #2e2e2e;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+/* Highlight styles for verses */
+.highlight-yellow {
+  background-color: rgba(254, 240, 138, 0.45);
+  border-bottom: 2px solid #eab308;
+}
+.dark .highlight-yellow {
+  background-color: rgba(234, 179, 8, 0.25);
+  border-bottom: 2px solid #ca8a04;
+}
+
+.highlight-green {
+  background-color: rgba(187, 247, 208, 0.45);
+  border-bottom: 2px solid #22c55e;
+}
+.dark .highlight-green {
+  background-color: rgba(34, 197, 94, 0.25);
+  border-bottom: 2px solid #16a34a;
+}
+
+.highlight-blue {
+  background-color: rgba(191, 219, 254, 0.45);
+  border-bottom: 2px solid #3b82f6;
+}
+.dark .highlight-blue {
+  background-color: rgba(59, 130, 246, 0.25);
+  border-bottom: 2px solid #2563eb;
+}
+
+.highlight-pink {
+  background-color: rgba(251, 207, 232, 0.45);
+  border-bottom: 2px solid #ec4899;
+}
+.dark .highlight-pink {
+  background-color: rgba(236, 72, 153, 0.25);
+  border-bottom: 2px solid #db2777;
+}
