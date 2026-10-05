@@ -368,6 +368,7 @@ export default function Home() {
               <div className="h-20 bg-stone-200 dark:bg-stone-800 rounded"></div>
               <div className="h-40 bg-stone-200 dark:bg-stone-800 rounded"></div>
             </div>
+          ) : devotional ? (
             <article className="overflow-hidden rounded-3xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-all duration-200">
               
               {/* 1. GAMBAR (Header Image) */}
@@ -511,6 +512,7 @@ export default function Home() {
                 </Link>
               </div>
 
+              </div>
             </article>
           ) : (
             <div className="p-8 text-center text-stone-400">
