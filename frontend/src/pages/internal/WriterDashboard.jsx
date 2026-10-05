@@ -18,7 +18,9 @@ export default function WriterDashboard() {
     passage_ref: '',
     passage_text: '',
     content: '',
+    quote: '',
     prayer: '',
+    image_url: '',
   });
 
   const showToast = (msg) => {
@@ -39,7 +41,9 @@ export default function WriterDashboard() {
         passage_ref: '',
         passage_text: '',
         content: '',
+        quote: '',
         prayer: '',
+        image_url: '',
       });
     } catch (err) {
       showToast('Gagal menerbitkan: ' + err.message);
@@ -175,6 +179,32 @@ export default function WriterDashboard() {
                 value={devoForm.content}
                 onChange={(e) => setDevoForm({ ...devoForm, content: e.target.value })}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-sm focus:border-blue-500 focus:outline-none font-serif leading-relaxed"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-1">
+                Kata Mutiara / Quote
+              </label>
+              <input
+                type="text"
+                placeholder="Ketika hati gelisah, datanglah kepada Tuhan..."
+                value={devoForm.quote}
+                onChange={(e) => setDevoForm({ ...devoForm, quote: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-sm focus:border-blue-500 focus:outline-none font-serif italic"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-1">
+                URL Gambar Header (Opsional)
+              </label>
+              <input
+                type="text"
+                placeholder="/devotionals/2026-10-01.jpg atau https://..."
+                value={devoForm.image_url}
+                onChange={(e) => setDevoForm({ ...devoForm, image_url: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-sm focus:border-blue-500 focus:outline-none"
               />
             </div>
 

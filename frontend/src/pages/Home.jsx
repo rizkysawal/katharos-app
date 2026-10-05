@@ -24,6 +24,7 @@ import {
   CalendarPlus,
   ArrowRight,
   CheckCircle2,
+  Quote,
 } from 'lucide-react';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 
@@ -108,7 +109,8 @@ export default function Home() {
   const handleShareWhatsApp = () => {
     if (!devotional) return;
     const url = window.location.origin;
-    const text = `*${devotional.title}*\nRenungan Harian Katharos (${formatIndonesianDate(devotional.publish_date)})\n\n"${devotional.passage_text || ''}" - ${devotional.passage_ref}\n\nBaca renungan selengkapnya di:\n${url}`;
+    const quotePart = devotional.quote ? `\n\n_Kata Mutiara:_\n"${devotional.quote}"` : '';
+    const text = `*${devotional.title}*\nRenungan Harian Katharos (${formatIndonesianDate(devotional.publish_date)})\n\n"${devotional.passage_text || ''}" - ${devotional.passage_ref}${quotePart}\n\nBaca renungan selengkapnya di:\n${url}`;
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(waUrl, '_blank');
   };
@@ -366,27 +368,45 @@ export default function Home() {
               <div className="h-20 bg-stone-200 dark:bg-stone-800 rounded"></div>
               <div className="h-40 bg-stone-200 dark:bg-stone-800 rounded"></div>
             </div>
-          ) : devotional ? (
-            <article className="p-6 sm:p-9 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-all duration-200">
+            <article className="overflow-hidden rounded-3xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-all duration-200">
               
-              {/* Devotional Header */}
-              <div className="border-b border-stone-100 dark:border-stone-800/80 pb-6 mb-6">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500 dark:text-stone-400 mb-2">
-                  <span className="font-semibold text-amber-700 dark:text-amber-400">
-                    {formatIndonesianDate(devotional.publish_date)}
-                  </span>
-                  <span>Oleh: {devotional.author || 'Tim Katharos'}</span>
+              {/* 1. GAMBAR (Header Image) */}
+              {devotional.image_url && (
+                <div className="relative w-full h-56 sm:h-72 md:h-84 overflow-hidden bg-stone-100 dark:bg-stone-800">
+                  <img
+                    src={devotional.image_url}
+                    alt={devotional.title}
+                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                 </div>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100 leading-tight mb-4">
-                  {devotional.title}
-                </h3>
+              )}
 
-                {/* Passage Reference Box */}
+              <div className="p-6 sm:p-9">
+                {/* 2. TANGGAL (Publish Date) & PENULIS */}
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500 dark:text-stone-400 mb-4 pb-3 border-b border-stone-100 dark:border-stone-800/80">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-amber-700 dark:text-amber-400">
+                      {formatIndonesianDate(devotional.publish_date)}
+                    </span>
+                    <span className="text-stone-300 dark:text-stone-700">•</span>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-medium">
+                      Santapan Rohani
+                    </span>
+                  </div>
+                  <span>Oleh: <strong className="text-stone-700 dark:text-stone-300">{devotional.author || 'Tim Katharos'}</strong></span>
+                </div>
+
+                {/* 3. AYAT (Passage Reference & Text) */}
                 {devotional.passage_ref && (
-                  <div className="rounded-2xl p-4 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide">
-                        Bacaan Alkitab
+                  <div className="rounded-2xl p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 mb-6">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span>Bacaan Alkitab</span>
                       </span>
                       <Link
                         to="/read"
@@ -403,26 +423,49 @@ export default function Home() {
                     )}
                   </div>
                 )}
-              </div>
 
-              {/* Devotional Content Body */}
-              <div
-                className={`font-serif ${fontSizes[fontSizeIndex]} text-stone-800 dark:text-stone-200 whitespace-pre-line space-y-4`}
-              >
-                {devotional.content}
-              </div>
+                {/* 4. JUDUL RENUNGAN (Title) */}
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100 leading-tight mb-6">
+                  {devotional.title}
+                </h3>
 
-              {/* Prayer Box */}
-              {devotional.prayer && (
-                <div className="mt-8 p-5 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/60 dark:border-stone-800">
-                  <h4 className="font-serif font-bold text-sm text-stone-900 dark:text-stone-100 mb-2 flex items-center gap-1.5">
-                    <span>🙏</span> Doa Hari Ini
-                  </h4>
-                  <p className="font-serif italic text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-relaxed">
-                    "{devotional.prayer}"
-                  </p>
+                {/* 5. ISI RENUNGAN (Body Content) */}
+                <div
+                  className={`font-serif ${fontSizes[fontSizeIndex]} text-stone-800 dark:text-stone-200 whitespace-pre-line space-y-4`}
+                >
+                  {devotional.content}
                 </div>
-              )}
+
+                {/* 6. QUOTE / KATA MUTIARA (Quotes) - tepat di atas Doa Hari Ini */}
+                {devotional.quote && (
+                  <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border-l-4 border-amber-500 dark:border-amber-400 text-stone-800 dark:text-stone-200 shadow-sm">
+                    <div className="flex items-start gap-3.5">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 text-amber-600 dark:text-amber-400 mt-0.5">
+                        <Quote className="w-4 h-4" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                          Kata Mutiara
+                        </div>
+                        <p className="font-serif italic font-medium text-base sm:text-lg text-stone-800 dark:text-stone-100 leading-relaxed">
+                          "{devotional.quote.replace(/^["“”']|["“”']$/g, '')}"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 7. DOA HARI INI (Prayer) */}
+                {devotional.prayer && (
+                  <div className="mt-6 p-5 sm:p-6 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-200/60 dark:border-stone-800">
+                    <h4 className="font-serif font-bold text-sm text-stone-900 dark:text-stone-100 mb-2 flex items-center gap-1.5">
+                      <span>🙏</span> Doa Hari Ini
+                    </h4>
+                    <p className="font-serif italic text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-relaxed">
+                      "{devotional.prayer.replace(/^["“”']|["“”']$/g, '')}"
+                    </p>
+                  </div>
+                )}
 
               {/* Action Toolbar */}
               <div className="mt-8 pt-6 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3">

@@ -10,7 +10,10 @@ type Devotional struct {
 	PassageRef  string    `json:"passage_ref"`
 	PassageText string    `json:"passage_text"`
 	Content     string    `json:"content"`
+	Quote       string    `json:"quote"`
 	Prayer      string    `json:"prayer"`
+	ImageURL    string    `json:"image_url"`
+	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

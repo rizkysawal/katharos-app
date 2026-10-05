@@ -116,7 +116,9 @@ export async function fetchTodayDevotional() {
 Namun Yesus mengingatkan kita dengan analogi yang sangat jelas: ranting yang terlepas dari pokoknya tidak akan mampu menghasilkan buah apa pun. Segala keindahan daunnya akan layu, dan kekuatannya akan sirna. Tinggal di dalam Kristus bukan sekadar menghadiri ibadah mingguan, melainkan membangun hubungan yang intim dan hidup setiap hari melalui doa, membaca firman, dan menundukkan kehendak kita pada kehendak-Nya.
 
 Ketika kita melekat pada pokok anggur yang sejati, aliran kasih, hikmat, dan damai Kristus akan mengalir dalam setiap pikiran dan tindakan kita. Di tengah ujian dan tekanan apa pun, kita akan dimampukan berbuah lebat—buah kasih, sukacita, dan ketabahan yang memberkati orang-orang di sekitar kita.`,
-      prayer: 'Tuhan Yesus yang baik, terima kasih karena Engkau telah memilih dan memanggil kami untuk menjadi bagian dari ranting-ranting-Mu. Ampuni kami jika seringkali kami merasa mampu berjalan sendiri dan menjauh dari hadirat-Mu. Ajar kami untuk senantiasa tinggal di dalam-Mu setiap hari, mempercayakan setiap pergumulan studi, masa depan, dan keluarga ke dalam tangan-Mu. Amin.'
+      quote: 'Tinggal di dalam Kristus adalah satu-satunya sumber kekuatan sejati untuk hidup yang berbuah lebat.',
+      prayer: 'Tuhan Yesus yang baik, terima kasih karena Engkau telah memilih dan memanggil kami untuk menjadi bagian dari ranting-ranting-Mu. Ampuni kami jika seringkali kami merasa mampu berjalan sendiri dan menjauh dari hadirat-Mu. Ajar kami untuk senantiasa tinggal di dalam-Mu setiap hari, mempercayakan setiap pergumulan studi, masa depan, dan keluarga ke dalam tangan-Mu. Amin.',
+      image_url: '/devotionals/2026-10-08.png'
     };
   }
 }

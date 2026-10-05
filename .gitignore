@@ -2,6 +2,8 @@
 db_data/
 backend_upload/
 .env
+data/*.xlsx
+data/*.xls
 
 # Go binaries
 *.exe

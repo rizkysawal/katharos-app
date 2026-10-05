@@ -28,7 +28,10 @@ func (r *PostgresCommunityRepository) GetTodayDevotional(ctx context.Context) (*
 			COALESCE(passage_ref, ''),
 			COALESCE(passage_text, ''),
 			content,
+			COALESCE(quote, ''),
 			COALESCE(prayer, ''),
+			COALESCE(image_url, ''),
+			COALESCE(status, 'published'),
 			created_at,
 			updated_at
 		FROM devotionals
@@ -44,7 +47,10 @@ func (r *PostgresCommunityRepository) GetTodayDevotional(ctx context.Context) (*
 		&d.PassageRef,
 		&d.PassageText,
 		&d.Content,
+		&d.Quote,
 		&d.Prayer,
+		&d.ImageURL,
+		&d.Status,
 		&d.CreatedAt,
 		&d.UpdatedAt,
 	)
@@ -62,7 +68,10 @@ func (r *PostgresCommunityRepository) GetTodayDevotional(ctx context.Context) (*
 			COALESCE(passage_ref, ''),
 			COALESCE(passage_text, ''),
 			content,
+			COALESCE(quote, ''),
 			COALESCE(prayer, ''),
+			COALESCE(image_url, ''),
+			COALESCE(status, 'published'),
 			created_at,
 			updated_at
 		FROM devotionals
@@ -77,7 +86,10 @@ func (r *PostgresCommunityRepository) GetTodayDevotional(ctx context.Context) (*
 		&d.PassageRef,
 		&d.PassageText,
 		&d.Content,
+		&d.Quote,
 		&d.Prayer,
+		&d.ImageURL,
+		&d.Status,
 		&d.CreatedAt,
 		&d.UpdatedAt,
 	)
@@ -109,7 +121,10 @@ func (r *PostgresCommunityRepository) GetDevotionalsArchive(ctx context.Context,
 				COALESCE(passage_ref, ''),
 				COALESCE(passage_text, ''),
 				content,
+				COALESCE(quote, ''),
 				COALESCE(prayer, ''),
+				COALESCE(image_url, ''),
+				COALESCE(status, 'published'),
 				created_at,
 				updated_at
 			FROM devotionals
@@ -128,7 +143,10 @@ func (r *PostgresCommunityRepository) GetDevotionalsArchive(ctx context.Context,
 				COALESCE(passage_ref, ''),
 				COALESCE(passage_text, ''),
 				content,
+				COALESCE(quote, ''),
 				COALESCE(prayer, ''),
+				COALESCE(image_url, ''),
+				COALESCE(status, 'published'),
 				created_at,
 				updated_at
 			FROM devotionals
@@ -155,7 +173,10 @@ func (r *PostgresCommunityRepository) GetDevotionalsArchive(ctx context.Context,
 			&d.PassageRef,
 			&d.PassageText,
 			&d.Content,
+			&d.Quote,
 			&d.Prayer,
+			&d.ImageURL,
+			&d.Status,
 			&d.CreatedAt,
 			&d.UpdatedAt,
 		); err != nil {
@@ -171,16 +192,23 @@ func (r *PostgresCommunityRepository) GetDevotionalsArchive(ctx context.Context,
 }
 
 func (r *PostgresCommunityRepository) CreateDevotional(ctx context.Context, d *model.Devotional) error {
+	status := d.Status
+	if status == "" {
+		status = "published"
+	}
 	query := `
-		INSERT INTO devotionals (publish_date, title, author, passage_ref, passage_text, content, prayer, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
+		INSERT INTO devotionals (publish_date, title, author, passage_ref, passage_text, content, quote, prayer, image_url, status, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP)
 		ON CONFLICT (publish_date) DO UPDATE
 		SET title = EXCLUDED.title,
 		    author = EXCLUDED.author,
 		    passage_ref = EXCLUDED.passage_ref,
 		    passage_text = EXCLUDED.passage_text,
 		    content = EXCLUDED.content,
+		    quote = EXCLUDED.quote,
 		    prayer = EXCLUDED.prayer,
+		    image_url = EXCLUDED.image_url,
+		    status = EXCLUDED.status,
 		    updated_at = CURRENT_TIMESTAMP
 		RETURNING id, created_at, updated_at;
 	`
@@ -193,7 +221,10 @@ func (r *PostgresCommunityRepository) CreateDevotional(ctx context.Context, d *m
 		d.PassageRef,
 		d.PassageText,
 		d.Content,
+		d.Quote,
 		d.Prayer,
+		d.ImageURL,
+		status,
 	).Scan(&d.ID, &d.CreatedAt, &d.UpdatedAt)
 }
 
