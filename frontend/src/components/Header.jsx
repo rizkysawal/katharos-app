@@ -1,6 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useBible } from '../context/BibleContext';
-import { BookOpen, Search, Sliders, ChevronDown } from 'lucide-react';
+import { BookOpen, Search, ChevronDown, Home } from 'lucide-react';
 import VersionSelector from './VersionSelector';
 
 export default function Header() {
@@ -18,16 +19,30 @@ export default function Header() {
     <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Logo / Brand */}
-        <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setIsPickerOpen(true)}>
-          <div className="w-8 h-8 rounded-lg bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-500/20">
-            <BookOpen className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="font-serif font-bold text-lg tracking-tight text-stone-900 dark:text-stone-100">
-              Katharos
-            </span>
-          </div>
+        {/* Logo / Brand & Home Link */}
+        <div className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 group p-1 -ml-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            title="Kembali ke Beranda Komunitas"
+          >
+            <div className="w-8 h-8 rounded-lg bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-4 h-4" />
+            </div>
+            <div className="hidden xs:block sm:block">
+              <span className="font-serif font-bold text-lg tracking-tight text-stone-900 dark:text-stone-100">
+                Katharos
+              </span>
+            </div>
+          </Link>
+
+          <Link
+            to="/"
+            className="hidden md:flex items-center gap-1 text-xs text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200 px-2 py-1 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800/60 transition-colors ml-1"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Beranda</span>
+          </Link>
         </div>
 
         {/* Center: Book & Chapter Picker Pill Button */}

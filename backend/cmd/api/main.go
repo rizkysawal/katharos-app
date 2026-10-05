@@ -31,9 +31,14 @@ func main() {
 		defer db.Close()
 	}
 
-	// Initialize Repository and Handlers
+	// Initialize Repositories and Handlers
 	bibleRepo := repository.NewPostgresBibleRepository(db)
 	bibleHandler := handler.NewBibleHandler(bibleRepo)
+
+	communityRepo := repository.NewPostgresCommunityRepository(db)
+	devotionalHandler := handler.NewDevotionalHandler(communityRepo)
+	eventHandler := handler.NewEventHandler(communityRepo)
+
 	healthHandler := handler.NewHealthHandler(bibleRepo)
 
 	// Routes
@@ -47,6 +52,12 @@ func main() {
 	mux.HandleFunc("/api/v1/books", bibleHandler.GetBooks)
 	mux.HandleFunc("/api/v1/read", bibleHandler.ReadChapter)
 	mux.HandleFunc("/api/v1/search", bibleHandler.Search)
+
+	// Community Endpoints (v1)
+	mux.HandleFunc("/api/v1/devotionals/today", devotionalHandler.GetTodayDevotional)
+	mux.HandleFunc("/api/v1/devotionals", devotionalHandler.HandleDevotionals)
+	mux.HandleFunc("/api/v1/events/upcoming", eventHandler.GetUpcomingEvents)
+	mux.HandleFunc("/api/v1/events", eventHandler.HandleEvents)
 
 	// Root welcome / info
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

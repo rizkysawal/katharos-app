@@ -1,25 +1,19 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { BibleProvider } from './context/BibleContext';
-import Header from './components/Header';
-import ReaderView from './components/ReaderView';
-import BookChapterPicker from './components/BookChapterPicker';
-import SearchModal from './components/SearchModal';
-import DisplaySettingsModal from './components/DisplaySettingsModal';
-import Toast from './components/Toast';
+import Home from './pages/Home';
+import Reader from './pages/Reader';
 
 export default function App() {
   return (
-    <BibleProvider>
-      <div className="min-h-screen flex flex-col transition-colors duration-200">
-        <Header />
-        <div className="flex-1">
-          <ReaderView />
-        </div>
-        <BookChapterPicker />
-        <SearchModal />
-        <DisplaySettingsModal />
-        <Toast />
-      </div>
-    </BibleProvider>
+    <BrowserRouter>
+      <BibleProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/read" element={<Reader />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BibleProvider>
+    </BrowserRouter>
   );
 }

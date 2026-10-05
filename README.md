@@ -1,6 +1,6 @@
-# Katharos — Alkitab Online Web Reader
+# Katharos — Alkitab Online & Komunitas PMK
 
-Aplikasi web pembaca Alkitab modern, minimalis, dan *distraction-free* dengan inspirasi desain ala Bible.com / YouVersion.
+Aplikasi web pembaca Alkitab modern, minimalis, dan *distraction-free* terintegrasi dengan landing page komunitas (Renungan Harian & Jadwal Kegiatan PMK).
 
 ---
 
@@ -9,31 +9,35 @@ Aplikasi web pembaca Alkitab modern, minimalis, dan *distraction-free* dengan in
 ```
 katharos-app/
 ├── backend/                  # Golang REST API Service
-│   ├── cmd/api/main.go       # Server entrypoint & graceful shutdown
+│   ├── cmd/api/main.go       # Server entrypoint & route registration
 │   ├── internal/
 │   │   ├── config/           # Environtment configuration loader
 │   │   ├── database/         # PostgreSQL connection & pool setup
-│   │   ├── handler/          # HTTP handlers (translations, books, read, search, health)
+│   │   ├── handler/          # HTTP handlers (bible, devotionals, events, health)
 │   │   ├── middleware/       # CORS middleware
-│   │   ├── model/            # Domain models & response structures
+│   │   ├── model/            # Domain models (bible, community)
 │   │   └── repository/       # Clean architecture data access layer
 │   ├── migrations/           # Skema DDL & SQL Seed scripts
 │   │   ├── 01_init_schema.sql
-│   │   └── 02_seed_data.sql
+│   │   ├── 02_seed_data.sql
+│   │   └── 03_community_features.sql
 │   ├── Dockerfile            # Multi-stage production build
 │   ├── go.mod
 │   └── go.sum
 ├── frontend/                 # React (Vite) + Tailwind CSS SPA
 │   ├── public/               # Favicon & static assets
 │   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Home.jsx      # Landing Page Komunitas (Renungan, Agenda PMK, Alert Banner)
+│   │   │   └── Reader.jsx    # Halaman Pembaca Alkitab Lengkap (/read)
 │   │   ├── components/       # Header, BookChapterPicker, ReaderView, VerseActionBar, etc.
-│   │   ├── context/          # BibleContext (state reader, sorotan, navigasi)
+│   │   ├── context/          # BibleContext (state reader, sorotan, preferensi)
 │   │   ├── services/         # API fetch client dengan graceful fallback
-│   │   ├── App.jsx
+│   │   ├── App.jsx           # React Router routing (/ dan /read)
 │   │   ├── main.jsx
 │   │   └── index.css         # Theme variables (Light, Sepia, Dark) & highlight styling
 │   ├── Dockerfile            # Multi-stage build (Node build -> Nginx alpine)
-│   ├── nginx.conf            # Reverse proxy & SPA routing
+│   ├── nginx.conf            # Reverse proxy /api/ & SPA router
 │   ├── package.json
 │   ├── tailwind.config.js
 │   └── vite.config.js
@@ -58,7 +62,8 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-- **Frontend Reader**: Buka browser di [http://localhost:3000](http://localhost:3000)
+- **Landing Page Komunitas**: Buka browser di [http://localhost:3001](http://localhost:3001) (rute `/`)
+- **Pembaca Alkitab Digital**: Buka di [http://localhost:3001/read](http://localhost:3001/read)
 - **Backend API**: Buka di [http://localhost:8080/api/health](http://localhost:8080/api/health)
 - **PostgreSQL**: Terhubung di `localhost:5432` (Database: `katharos_db`, User: `katharos_user`)
 
@@ -73,7 +78,7 @@ Gunakan Docker untuk menjalankan PostgreSQL saja:
 ```bash
 docker compose up -d database
 ```
-*Skema dan seed data (`01_init_schema.sql` dan `02_seed_data.sql`) akan langsung dieksekusi secara otomatis saat database pertama kali menyala.*
+*Skema dan seed data (`01`, `02`, dan `03`) akan langsung dieksekusi secara otomatis saat database pertama kali menyala.*
 
 #### 2. Jalankan Backend (Golang)
 Buka terminal baru di folder `backend/`:
@@ -103,6 +108,7 @@ Frontend akan aktif di `http://localhost:5173`. Semua request `/api/*` otomatis 
 
 ## 📡 Daftar Endpoint RESTful API
 
+### Modul Alkitab (Bible)
 | Method | Endpoint | Deskripsi |
 |---|---|---|
 | `GET` | `/api/health` | Status kesehatan server & status koneksi database |
@@ -111,29 +117,31 @@ Frontend akan aktif di `http://localhost:5173`. Semua request `/api/*` otomatis 
 | `GET` | `/api/v1/read?book=GEN&chapter=1&translation=TB` | Mengambil seluruh ayat 1 pasal lengkap dengan navigasi Prev/Next |
 | `GET` | `/api/v1/search?q=terang&translation=TB&page=1&limit=20` | Full-text search (tsvector + pg_trgm) pada ayat |
 
+### Modul Komunitas (Devotionals & Events)
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| `GET` | `/api/v1/devotionals/today` | Mengambil renungan harian sesuai tanggal sistem saat ini |
+| `GET` | `/api/v1/devotionals?month=X&year=Y` | Arsip renungan bulanan |
+| `POST` | `/api/v1/devotionals` | Tambah renungan baru (payload JSON) |
+| `GET` | `/api/v1/events/upcoming` | List kegiatan PMK mendatang terurut dari waktu terdekat |
+| `POST` | `/api/v1/events` | Tambah agenda kegiatan baru |
+
 ---
 
-## 🎨 Fitur Frontend Web Reader
+## 🎨 Fitur Frontend
 
-1. **Header Distraction-Free**:
-   - Quick selector pill: Nama Kitab & Pasal (contoh: "Kejadian 1 ▾").
-   - Dropdown pemilih terjemahan (TB / BIMK / KJV).
-   - Pencarian cepat modal (`Ctrl+K`).
-   - Pengaturan tampilan font (`Aa`).
-2. **Modal Pemilih Kitab & Pasal**:
-   - Filter cepat dengan pencarian teks ("Kej", "Mat", "Yoh", dll).
-   - Tab Perjanjian Lama (39 kitab) dan Perjanjian Baru (27 kitab).
-   - Grid angka pasal interaktif (1, 2, 3...).
-3. **Pengalaman Membaca Modern**:
-   - Opsi Font: Gaya **Serif** (Lora) atau **Sans-Serif** (Plus Jakarta Sans).
-   - 4 pilihan ukuran font: Kecil, Normal, Besar, Sangat Besar.
-   - 3 Tema visual: **Terang** (Parchment), **Sepia** (Warm Book Paper), dan **Gelap** (OLED Dark).
-   - Penomoran ayat superscript kecil yang rapi di samping teks ayat.
-4. **Interaksi Ayat & Sorotan (Highlight)**:
-   - Klik ayat untuk memilih satu atau beberapa ayat sekaligus.
-   - Action bar mengambang (*floating toolbar*) di bagian bawah.
-   - Pilihan warna sorotan: Kuning, Hijau, Biru, dan Pink (tersimpan di `localStorage`).
-   - Salin ayat otomatis terformat dengan kutipan:  
-     `"Pada mulanya Allah menciptakan langit dan bumi." - Kejadian 1:1 (TB)`
-5. **Navigasi Bab**:
-   - Tombol *Previous Chapter* dan *Next Chapter* di bagian bawah dengan preview nama kitab & pasal.
+### 1. Halaman Utama Komunitas (`/`)
+- **Top Alert Banner:** Muncul dinamis jika ada agenda dengan `is_alert = true` (pindah tempat/jadwal darurat).
+- **Renungan Hari Ini:** Teks firman, konten renungan, dan doa hari ini.
+  - Pengatur ukuran font (`A-` / `A+`).
+  - Tombol **Share WhatsApp** yang otomatis memformat teks kutipan dan link.
+  - Tombol **Bookmark/Simpan** tersimpan ke `localStorage`.
+- **Agenda PMK:** Kartu kegiatan dengan badge kategori, waktu, pembicara, lokasi Google Maps, dan tombol **Add to Google Calendar**.
+- **CTA Baca Alkitab:** Tautan langsung menuju reader `/read`.
+
+### 2. Halaman Reader Alkitab (`/read`)
+- **Header Distraction-Free:** Quick selector pill kitab/pasal, dropdown terjemahan (TB/BIMK/KJV), modal search (`Ctrl+K`), dan link kembali ke Beranda.
+- **Drawer Pemilih Kitab & Grid Pasal:** Pencarian kitab, filter PL (39) / PB (27), dan grid angka pasal interaktif.
+- **Reader Utama:** Tipografi nyaman (Serif Lora / Sans Inter), 4 pilihan ukuran teks, tema (Terang / Sepia / Gelap), dan penomoran ayat *superscript*.
+- **Interaksi Ayat:** Klik ayat untuk memunculkan floating toolbar (salin teks + referensi, pilihan warna highlight).
+- **Navigasi:** Tombol Previous & Next Chapter di bagian bawah.
