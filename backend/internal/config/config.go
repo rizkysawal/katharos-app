@@ -15,6 +15,8 @@ type Config struct {
 	DBName             string
 	DBSSLMode          string
 	CORSAllowedOrigins string
+	JWTSecret          string
+	GoogleClientID     string
 }
 
 func Load() *Config {
@@ -27,6 +29,8 @@ func Load() *Config {
 		DBName:             getEnv("POSTGRES_DB", getEnv("DB_NAME", "katharos_db")),
 		DBSSLMode:          getEnv("DB_SSLMODE", "disable"),
 		CORSAllowedOrigins: getEnv("CORS_ALLOWED_ORIGINS", "*"),
+		JWTSecret:          getEnv("JWT_SECRET", "katharos_super_secret_jwt_key_2026_salt_xyz"),
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
 	}
 }
 

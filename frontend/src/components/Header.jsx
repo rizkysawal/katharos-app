@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useBible } from '../context/BibleContext';
 import { BookOpen, Search, ChevronDown, Home } from 'lucide-react';
 import VersionSelector from './VersionSelector';
+import GoogleAuthButton from './GoogleAuthButton';
 
 export default function Header() {
   const {
@@ -78,6 +79,9 @@ export default function Header() {
           >
             Aa
           </button>
+
+          {/* Member Google Login / Profile */}
+          <GoogleAuthButton />
         </div>
       </div>
     </header>

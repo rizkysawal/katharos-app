@@ -15,6 +15,7 @@ import (
 	"katharos-backend/internal/handler"
 	"katharos-backend/internal/middleware"
 	"katharos-backend/internal/repository"
+	"katharos-backend/internal/service"
 )
 
 func main() {
@@ -31,13 +32,17 @@ func main() {
 		defer db.Close()
 	}
 
-	// Initialize Repositories and Handlers
+	// Initialize Repositories and Services
 	bibleRepo := repository.NewPostgresBibleRepository(db)
 	bibleHandler := handler.NewBibleHandler(bibleRepo)
 
 	communityRepo := repository.NewPostgresCommunityRepository(db)
 	devotionalHandler := handler.NewDevotionalHandler(communityRepo)
 	eventHandler := handler.NewEventHandler(communityRepo)
+
+	userRepo := repository.NewPostgresUserRepository(db)
+	jwtService := service.NewJWTService(cfg.JWTSecret)
+	authHandler := handler.NewAuthHandler(userRepo, jwtService)
 
 	healthHandler := handler.NewHealthHandler(bibleRepo)
 
@@ -58,6 +63,16 @@ func main() {
 	mux.HandleFunc("/api/v1/devotionals", devotionalHandler.HandleDevotionals)
 	mux.HandleFunc("/api/v1/events/upcoming", eventHandler.GetUpcomingEvents)
 	mux.HandleFunc("/api/v1/events", eventHandler.HandleEvents)
+
+	// Authentication Endpoints (v1)
+	mux.HandleFunc("/api/v1/auth/google", authHandler.GoogleLogin)
+	mux.HandleFunc("/api/v1/auth/internal/login", authHandler.InternalLogin)
+	mux.HandleFunc("/api/v1/auth/me", middleware.RequireAuth(jwtService, authHandler.GetMe))
+
+	// Protected Role-based Endpoints (v1)
+	mux.HandleFunc("/api/v1/member/profile", middleware.RequireAuth(jwtService, authHandler.MemberProfile))
+	mux.HandleFunc("/api/v1/writer/drafts", middleware.RequireRole(jwtService, []string{"writer", "admin"}, authHandler.WriterDrafts))
+	mux.HandleFunc("/api/v1/admin/users", middleware.RequireRole(jwtService, []string{"admin"}, authHandler.AdminUsers))
 
 	// Root welcome / info
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

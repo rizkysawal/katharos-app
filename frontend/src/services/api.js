@@ -188,3 +188,59 @@ export async function fetchUpcomingEvents() {
     ];
   }
 }
+
+export async function loginWithGoogleApi(payload) {
+  const res = await fetch(`${API_BASE}/v1/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return await handleResponse(res);
+}
+
+export async function loginInternalApi(email, password) {
+  const res = await fetch(`${API_BASE}/v1/auth/internal/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  return await handleResponse(res);
+}
+
+export async function fetchCurrentUserApi(token) {
+  const res = await fetch(`${API_BASE}/v1/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await handleResponse(res);
+}
+
+export async function createDevotionalApi(data, token) {
+  const res = await fetch(`${API_BASE}/v1/devotionals`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  return await handleResponse(res);
+}
+
+export async function createEventApi(data, token) {
+  const res = await fetch(`${API_BASE}/v1/events`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  return await handleResponse(res);
+}
+
+export async function fetchAdminUsersApi(token) {
+  const res = await fetch(`${API_BASE}/v1/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await handleResponse(res);
+}

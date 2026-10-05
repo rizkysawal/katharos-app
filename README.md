@@ -126,12 +126,40 @@ Frontend akan aktif di `http://localhost:5173`. Semua request `/api/*` otomatis 
 | `GET` | `/api/v1/events/upcoming` | List kegiatan PMK mendatang terurut dari waktu terdekat |
 | `POST` | `/api/v1/events` | Tambah agenda kegiatan baru |
 
+### Modul Autentikasi & Keamanan (Auth & RBAC)
+| Method | Endpoint | Proteksi Role | Deskripsi |
+|---|---|---|---|
+| `POST` | `/api/v1/auth/google` | Publik | Verifikasi Google ID token & terbitkan JWT (`role: member`) |
+| `POST` | `/api/v1/auth/internal/login` | Publik (Internal) | Login lokal bcrypt khusus pengurus (`role: admin/writer`) |
+| `GET` | `/api/v1/auth/me` | Bearer Token | Mengambil profil user yang sedang login |
+| `GET` | `/api/v1/member/profile` | `member, writer, admin` | Akses data jemaat/member |
+| `GET` | `/api/v1/writer/drafts` | `writer, admin` | Akses studio penulisan naskah |
+| `GET` | `/api/v1/admin/users` | `admin` | Akses direktori pengguna terdaftar |
+
+---
+
+## 🔐 Arsitektur Autentikasi Dua Jalur (Two-Track Auth)
+
+1. **Jalur Publik — Jemaat (`role = 'member'`):**
+   - Tombol "Masuk dengan Google" di navbar publik (`/` dan `/read`).
+   - Tidak memerlukan kata sandi. Begitu login sukses via Google, profil otomatis tersimpan sebagai Member.
+   - Tidak memiliki akses ke rute pengurus `/internal/*` (otomatis di-redirect kembali ke `/`).
+
+2. **Jalur Rahasia — Pengurus (`role = 'admin'` dan `'writer'`):**
+   - **Tanpa link atau tombol apa pun di navigasi publik.**
+   - Hanya dapat diakses dengan mengetikkan URL rahasia langsung di browser: **`/internal/login`**.
+   - Menggunakan kredensial lokal (Username/Email + Password terenkripsi bcrypt).
+   - Akun Default Seed:
+     - **Super Admin:** `admin@katharos.or.id` (Password: `AdminKatharos2026!`) -> Akses `/internal/admin`
+     - **Penulis:** `writer@katharos.or.id` (Password: `WriterKatharos2026!`) -> Akses `/internal/writer`
+
 ---
 
 ## 🎨 Fitur Frontend
 
 ### 1. Halaman Utama Komunitas (`/`)
 - **Top Alert Banner:** Muncul dinamis jika ada agenda dengan `is_alert = true` (pindah tempat/jadwal darurat).
+- **Navbar Publik:** Menampilkan tombol "Masuk dengan Google" atau avatar akun jemaat jika sudah login.
 - **Renungan Hari Ini:** Teks firman, konten renungan, dan doa hari ini.
   - Pengatur ukuran font (`A-` / `A+`).
   - Tombol **Share WhatsApp** yang otomatis memformat teks kutipan dan link.
@@ -140,8 +168,13 @@ Frontend akan aktif di `http://localhost:5173`. Semua request `/api/*` otomatis 
 - **CTA Baca Alkitab:** Tautan langsung menuju reader `/read`.
 
 ### 2. Halaman Reader Alkitab (`/read`)
-- **Header Distraction-Free:** Quick selector pill kitab/pasal, dropdown terjemahan (TB/BIMK/KJV), modal search (`Ctrl+K`), dan link kembali ke Beranda.
+- **Header Distraction-Free:** Quick selector pill kitab/pasal, dropdown terjemahan (TB/BIMK/KJV), modal search (`Ctrl+K`), tombol akun Google, dan link kembali ke Beranda.
 - **Drawer Pemilih Kitab & Grid Pasal:** Pencarian kitab, filter PL (39) / PB (27), dan grid angka pasal interaktif.
 - **Reader Utama:** Tipografi nyaman (Serif Lora / Sans Inter), 4 pilihan ukuran teks, tema (Terang / Sepia / Gelap), dan penomoran ayat *superscript*.
 - **Interaksi Ayat:** Klik ayat untuk memunculkan floating toolbar (salin teks + referensi, pilihan warna highlight).
 - **Navigasi:** Tombol Previous & Next Chapter di bagian bawah.
+
+### 3. Halaman & Dashboard Khusus Pengurus (`/internal/*`)
+- **`/internal/login`:** Gateway rahasia khusus pengurus (Admin & Penulis).
+- **`/internal/admin`:** Dashboard Super Admin untuk menambah agenda kegiatan, mempublikasikan renungan, dan memantau daftar user.
+- **`/internal/writer`:** Studio Penulis untuk menyusun dan menerbitkan naskah renungan harian.

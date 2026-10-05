@@ -25,6 +25,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const STORAGE_BOOKMARKS = 'katharos_bookmarked_devotionals';
 
@@ -253,8 +254,11 @@ export default function Home() {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm shadow-sm transition-all duration-150 active:scale-95"
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Baca Alkitab</span>
+              <span className="hidden xs:inline">Baca Alkitab</span>
             </Link>
+
+            {/* Google Authentication Button for Members (Jemaat) */}
+            <GoogleAuthButton />
 
             {/* Quick Theme Toggle */}
             <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full p-0.5 border border-stone-200 dark:border-stone-700 ml-1">
