@@ -128,16 +128,16 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col">
       
       {/* Top Navbar */}
-      <header className="border-b border-stone-800 bg-stone-900/90 backdrop-blur-md px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold">
-            <ShieldCheck className="w-5 h-5" />
+      <header className="border-b border-stone-800 bg-stone-900/90 backdrop-blur-md px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold shrink-0">
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="font-serif font-bold text-base text-stone-100">
+            <h1 className="font-serif font-bold text-sm sm:text-base text-stone-100">
               Katharos Admin Workspace
             </h1>
-            <p className="text-xs text-stone-400">
+            <p className="text-[11px] sm:text-xs text-stone-400">
               Login sebagai: <span className="text-amber-400 font-semibold">{user?.full_name}</span> ({user?.role})
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-stone-800 hover:bg-red-950/40 hover:text-red-400 text-stone-300 text-xs font-semibold border border-stone-700 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 rounded-xl bg-stone-800 hover:bg-red-950/40 hover:text-red-400 text-stone-300 text-xs font-semibold border border-stone-700 transition-colors shrink-0"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Keluar</span>
@@ -153,10 +153,10 @@ export default function AdminDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 flex-1">
+      <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-1">
         
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-stone-800 pb-3 mb-8">
+        <div className="flex items-center gap-2 border-b border-stone-800 pb-3 mb-6 sm:mb-8 overflow-x-auto scrollbar-none">
           {[
             { id: 'events', label: 'Kelola Agenda PMK', icon: Calendar },
             { id: 'devotionals', label: 'Kelola Renungan', icon: BookOpen },
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 active:scale-95 ${
                   isActive
                     ? 'bg-amber-600 text-stone-950 shadow-md font-bold'
                     : 'text-stone-400 hover:text-stone-100 hover:bg-stone-900'

@@ -140,29 +140,30 @@ export default function BookChapterPicker() {
               </div>
 
               {/* Testament Filter Tabs */}
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none pb-0.5">
                 {[
-                  { id: 'ALL', label: 'Semua (66)' },
-                  { id: 'OT', label: 'Perjanjian Lama (39)' },
-                  { id: 'NT', label: 'Perjanjian Baru (27)' },
+                  { id: 'ALL', fullLabel: 'Semua (66)', shortLabel: 'Semua' },
+                  { id: 'OT', fullLabel: 'Perjanjian Lama (39)', shortLabel: 'PL (39)' },
+                  { id: 'NT', fullLabel: 'Perjanjian Baru (27)', shortLabel: 'PB (27)' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors shrink-0 active:scale-95 ${
                       activeTab === tab.id
                         ? 'bg-amber-600 text-white shadow-sm'
                         : 'bg-stone-200/70 hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300'
                     }`}
                   >
-                    {tab.label}
+                    <span className="hidden xs:inline">{tab.fullLabel}</span>
+                    <span className="xs:hidden">{tab.shortLabel}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Scrollable Books Grid */}
-            <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2">
               {filteredBooks.map((book) => {
                 const isCurrent = book.code === currentBook;
                 return (

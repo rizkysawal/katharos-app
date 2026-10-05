@@ -32,6 +32,16 @@
   }
 }
 
+/* Mobile touch and tap optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -46,6 +56,15 @@
 }
 .dark ::-webkit-scrollbar-thumb {
   background: #3f3f46;
+}
+
+/* Hide scrollbar utility for clean mobile carousels */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Highlight styles for verses */

@@ -18,7 +18,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
         
         {/* Logo / Brand & Home Link */}
         <div className="flex items-center gap-2">
@@ -27,10 +27,10 @@ export default function Header() {
             className="flex items-center gap-2 group p-1 -ml-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             title="Kembali ke Beranda Komunitas"
           >
-            <div className="w-8 h-8 rounded-lg bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
               <BookOpen className="w-4 h-4" />
             </div>
-            <div className="hidden xs:block sm:block">
+            <div className="hidden sm:block">
               <span className="font-serif font-bold text-lg tracking-tight text-stone-900 dark:text-stone-100">
                 Katharos
               </span>
@@ -49,24 +49,25 @@ export default function Header() {
         {/* Center: Book & Chapter Picker Pill Button */}
         <button
           onClick={() => setIsPickerOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 dark:bg-stone-800 dark:hover:bg-stone-700/80 text-stone-900 dark:text-stone-100 font-medium text-sm transition-all duration-150 active:scale-95 shadow-sm border border-stone-200/60 dark:border-stone-700/60"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 dark:bg-stone-800 dark:hover:bg-stone-700/80 text-stone-900 dark:text-stone-100 font-medium text-xs sm:text-sm transition-all duration-150 active:scale-95 shadow-sm border border-stone-200/60 dark:border-stone-700/60 max-w-[130px] xs:max-w-[200px] sm:max-w-none"
           title="Pilih Kitab dan Pasal"
         >
-          <span className="font-semibold">{currentBookName}</span>
-          <span>{currentChapterNum}</span>
-          <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5" />
+          <span className="font-semibold truncate">{currentBookName}</span>
+          <span className="shrink-0">{currentChapterNum}</span>
+          <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5 shrink-0" />
         </button>
 
         {/* Right Actions: Translation Dropdown, Search, Settings */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           {/* Version Selector */}
           <VersionSelector />
 
           {/* Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-2 rounded-full text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-1.5 sm:p-2 rounded-full text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             title="Cari Ayat (Ctrl+K)"
+            aria-label="Cari Ayat"
           >
             <Search className="w-4 h-4" />
           </button>
@@ -74,8 +75,9 @@ export default function Header() {
           {/* Typography & Display Settings */}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-2 rounded-full text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors font-serif font-bold text-sm"
+            className="p-1.5 sm:p-2 rounded-full text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors font-serif font-bold text-xs sm:text-sm"
             title="Pengaturan Tampilan & Font"
+            aria-label="Pengaturan Tampilan"
           >
             Aa
           </button>

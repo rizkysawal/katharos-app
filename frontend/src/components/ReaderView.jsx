@@ -78,12 +78,12 @@ export default function ReaderView() {
   const verses = chapterData?.verses || [];
 
   return (
-    <main className="min-h-screen pb-32 pt-8 sm:pt-12 px-4 sm:px-6">
+    <main className="min-h-screen pb-32 pt-6 sm:pt-12 px-3.5 sm:px-6">
       <article className="max-w-3xl mx-auto">
         
         {/* Chapter Header Title */}
-        <header className="text-center mb-10 sm:mb-14">
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+        <header className="text-center mb-6 sm:mb-14">
+          <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-1.5 sm:mb-2">
             {bookName} {chapterNumber}
           </h1>
           <p className="text-xs sm:text-sm font-sans tracking-wide text-stone-500 dark:text-stone-400 uppercase font-medium">

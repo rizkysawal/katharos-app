@@ -106,7 +106,7 @@ export default function GoogleAuthButton() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700/80 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95"
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700/80 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700 text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95"
         title="Masuk Akun Jemaat dengan Google"
       >
         {/* Google G SVG */}
@@ -128,7 +128,8 @@ export default function GoogleAuthButton() {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>Masuk Google</span>
+        <span className="hidden xs:inline">Masuk</span>
+        <span className="hidden sm:inline"> Google</span>
       </button>
 
       {/* Google Login Dialog */}
