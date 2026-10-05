@@ -694,7 +694,7 @@ export default function Home() {
             >
               {monthDevotionals.map((item) => {
                 const isToday = item.publish_date === todayPublishDate;
-                const isActive = devotional && (devotional.id === item.id || devotional.publish_date === item.publish_date);
+                const isActive = devotional && devotional.publish_date === item.publish_date;
 
                 return (
                   <div

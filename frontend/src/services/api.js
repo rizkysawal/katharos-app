@@ -1,3 +1,5 @@
+import { FALLBACK_OCTOBER_DEVOTIONALS } from '../data/fallbackDevotionals';
+
 const API_BASE = '/api';
 
 /**
@@ -104,22 +106,14 @@ export async function fetchTodayDevotional() {
     return await handleResponse(res);
   } catch (err) {
     console.warn('[Katharos API] Using fallback today devotional:', err.message);
-    return {
-      id: 1,
-      publish_date: new Date().toISOString().split('T')[0],
-      title: 'Tinggal di dalam Pokok Anggur yang Benar',
-      author: 'Tim Pembina PMK Katharos',
-      passage_ref: 'Yohanes 15:4-5',
-      passage_text: 'Tinggallah di dalam Aku dan Aku di dalam kamu. Sama seperti ranting tidak dapat berbuah dari dirinya sendiri, jikalau ia tidak tinggal pada pokok anggur, demikian juga kamu tidak berbuah, jikalau kamu tidak tinggal di dalam Aku.',
-      content: `Dalam dinamika kehidupan kampus dan kesibukan sehari-hari, seringkali kita terjebak dalam ilusi bahwa keberhasilan dan damai sejahtera dapat kita raih semata-mata dengan kekuatan kita sendiri. Kita bekerja keras menyelesaikan tugas, aktif berorganisasi, dan mengejar target akademis, hingga terkadang waktu bersekutu dengan Tuhan terpinggirkan.
-
-Namun Yesus mengingatkan kita dengan analogi yang sangat jelas: ranting yang terlepas dari pokoknya tidak akan mampu menghasilkan buah apa pun. Segala keindahan daunnya akan layu, dan kekuatannya akan sirna. Tinggal di dalam Kristus bukan sekadar menghadiri ibadah mingguan, melainkan membangun hubungan yang intim dan hidup setiap hari melalui doa, membaca firman, dan menundukkan kehendak kita pada kehendak-Nya.
-
-Ketika kita melekat pada pokok anggur yang sejati, aliran kasih, hikmat, dan damai Kristus akan mengalir dalam setiap pikiran dan tindakan kita. Di tengah ujian dan tekanan apa pun, kita akan dimampukan berbuah lebat—buah kasih, sukacita, dan ketabahan yang memberkati orang-orang di sekitar kita.`,
-      quote: 'Tinggal di dalam Kristus adalah satu-satunya sumber kekuatan sejati untuk hidup yang berbuah lebat.',
-      prayer: 'Tuhan Yesus yang baik, terima kasih karena Engkau telah memilih dan memanggil kami untuk menjadi bagian dari ranting-ranting-Mu. Ampuni kami jika seringkali kami merasa mampu berjalan sendiri dan menjauh dari hadirat-Mu. Ajar kami untuk senantiasa tinggal di dalam-Mu setiap hari, mempercayakan setiap pergumulan studi, masa depan, dan keluarga ke dalam tangan-Mu. Amin.',
-      image_url: '/devotionals/2026-10-08.png'
-    };
+    const todayStr = new Date().toISOString().split('T')[0];
+    const found = FALLBACK_OCTOBER_DEVOTIONALS.find((d) => d.publish_date === todayStr);
+    if (found) return found;
+    // Default to Day 5 (2026-10-05) if today is not within October 2026 range
+    return (
+      FALLBACK_OCTOBER_DEVOTIONALS.find((d) => d.publish_date === '2026-10-05') ||
+      FALLBACK_OCTOBER_DEVOTIONALS[4]
+    );
   }
 }
 
@@ -129,10 +123,12 @@ export async function fetchDevotionalsArchive(month, year) {
     if (month) q.set('month', month);
     if (year) q.set('year', year);
     const res = await fetch(`${API_BASE}/v1/devotionals?${q.toString()}`);
-    return await handleResponse(res);
+    const data = await handleResponse(res);
+    if (Array.isArray(data) && data.length > 0) return data;
+    return FALLBACK_OCTOBER_DEVOTIONALS;
   } catch (err) {
     console.warn('[Katharos API] Archive fetch error:', err.message);
-    return [];
+    return FALLBACK_OCTOBER_DEVOTIONALS;
   }
 }
 
