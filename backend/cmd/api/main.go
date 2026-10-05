@@ -16,6 +16,7 @@ import (
 	"katharos-backend/internal/middleware"
 	"katharos-backend/internal/repository"
 	"katharos-backend/internal/service"
+	"katharos-backend/migrations"
 )
 
 func main() {
@@ -30,6 +31,15 @@ func main() {
 	} else {
 		log.Println("[Katharos] Connected to PostgreSQL successfully.")
 		defer db.Close()
+
+		// Run automated database migrations (01 through 04)
+		migCtx, migCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		if err := migrations.Run(migCtx, db); err != nil {
+			log.Printf("[Katharos ERROR] Failed running database migrations: %v", err)
+		} else {
+			log.Println("[Katharos] All database migrations verified and applied successfully.")
+		}
+		migCancel()
 	}
 
 	// Initialize Repositories and Services

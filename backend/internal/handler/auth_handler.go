@@ -133,18 +133,26 @@ func (h *AuthHandler) InternalLogin(w http.ResponseWriter, r *http.Request) {
 	// 1. Fetch user by email
 	user, err := h.userRepo.GetUserByEmail(r.Context(), email)
 	if err != nil {
-		Error(w, http.StatusUnauthorized, "Email atau kata sandi tidak sesuai.")
+		if strings.Contains(err.Error(), "user not found") {
+			log.Printf("[Auth WARN] Internal login failed for %s: user not found", email)
+			Error(w, http.StatusUnauthorized, "Email atau kata sandi tidak sesuai.")
+			return
+		}
+		log.Printf("[Auth ERROR] Database error on GetUserByEmail for %s: %v", email, err)
+		Error(w, http.StatusInternalServerError, "Gagal mengakses database pengguna: "+err.Error())
 		return
 	}
 
 	// 2. Strict Check: Only 'admin' and 'writer' can use the internal login gateway!
 	if user.Role != model.RoleAdmin && user.Role != model.RoleWriter {
+		log.Printf("[Auth WARN] Forbidden login attempt by user %s with role '%s'", email, user.Role)
 		Error(w, http.StatusForbidden, "Akses ditolak. Halaman ini hanya untuk pengurus (Admin & Penulis).")
 		return
 	}
 
 	// 3. Verify bcrypt password hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		log.Printf("[Auth WARN] Password mismatch for user %s", email)
 		Error(w, http.StatusUnauthorized, "Email atau kata sandi tidak sesuai.")
 		return
 	}
