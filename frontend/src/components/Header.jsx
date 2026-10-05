@@ -17,11 +17,11 @@ export default function Header() {
   const currentChapterNum = chapterData?.chapter || 1;
 
   return (
-    <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200">
-      <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
+    <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200 overflow-hidden">
+      <div className="max-w-5xl mx-auto px-2.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1 sm:gap-4 w-full">
         
         {/* Logo / Brand & Home Link */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             to="/"
             className="flex items-center gap-2 group p-1 -ml-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
@@ -49,7 +49,7 @@ export default function Header() {
         {/* Center: Book & Chapter Picker Pill Button */}
         <button
           onClick={() => setIsPickerOpen(true)}
-          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 dark:bg-stone-800 dark:hover:bg-stone-700/80 text-stone-900 dark:text-stone-100 font-medium text-xs sm:text-sm transition-all duration-150 active:scale-95 shadow-sm border border-stone-200/60 dark:border-stone-700/60 max-w-[130px] xs:max-w-[200px] sm:max-w-none"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 dark:bg-stone-800 dark:hover:bg-stone-700/80 text-stone-900 dark:text-stone-100 font-medium text-xs sm:text-sm transition-all duration-150 active:scale-95 shadow-sm border border-stone-200/60 dark:border-stone-700/60 max-w-[110px] xs:max-w-[180px] sm:max-w-none"
           title="Pilih Kitab dan Pasal"
         >
           <span className="font-semibold truncate">{currentBookName}</span>

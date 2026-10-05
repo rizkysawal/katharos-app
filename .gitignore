@@ -4,6 +4,8 @@ backend_upload/
 .env
 data/*.xlsx
 data/*.xls
+*.sqlite3
+*.zip
 
 # Go binaries
 *.exe

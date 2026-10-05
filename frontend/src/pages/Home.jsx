@@ -106,20 +106,6 @@ export default function Home() {
     loadData();
   }, []);
 
-  // Auto-center horizontal carousel on today's devotional card
-  useEffect(() => {
-    if (monthDevotionals.length > 0 && todayCardRef.current && carouselRef.current) {
-      const timer = setTimeout(() => {
-        todayCardRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest',
-        });
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, [monthDevotionals]);
-
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -223,11 +209,14 @@ export default function Home() {
         setBookmarked(saved.includes(todayItem.id));
       }
     }
-    todayCardRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      inline: 'center',
-      block: 'nearest',
-    });
+    if (todayCardRef.current && carouselRef.current) {
+      const card = todayCardRef.current;
+      const container = carouselRef.current;
+      container.scrollTo({
+        left: card.offsetLeft - (container.offsetWidth / 2) + (card.offsetWidth / 2),
+        behavior: 'smooth'
+      });
+    }
   };
 
   const formatEventTime = (startTime, endTime) => {
@@ -288,18 +277,18 @@ export default function Home() {
   const alertEvent = events.find((e) => e.is_alert);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf9] dark:bg-[#121212] text-stone-900 dark:text-stone-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[#fafaf9] dark:bg-[#121212] text-stone-900 dark:text-stone-100 transition-colors duration-200 w-full overflow-x-hidden">
       
       {/* 1. TOP ALERT BANNER (If any upcoming event has is_alert = true) */}
       {alertEvent && !alertDismissed && (
         <aside
           role="alert"
           aria-label="Pengumuman Penting"
-          className="bg-amber-500 text-stone-950 font-medium px-3 sm:px-4 py-2 sm:py-2.5 shadow-md flex items-center justify-between gap-2.5 text-xs sm:text-sm animate-in slide-in-from-top duration-300"
+          className="bg-amber-500 text-stone-950 font-medium px-3 sm:px-4 py-2 sm:py-2.5 shadow-md flex items-center justify-between gap-2.5 text-xs sm:text-sm animate-in slide-in-from-top duration-300 w-full overflow-hidden"
         >
           <div className="max-w-5xl mx-auto flex items-center gap-2 flex-1 min-w-0">
             <AlertTriangle className="w-4 h-4 shrink-0 text-stone-950 animate-bounce" />
-            <div className="truncate">
+            <div className="truncate min-w-0">
               <span className="font-bold underline uppercase mr-1">Info:</span>
               <span className="font-semibold">{alertEvent.title}:</span>{' '}
               <span className="opacity-95">{alertEvent.notes || alertEvent.location}</span>
@@ -316,16 +305,16 @@ export default function Home() {
       )}
 
       {/* 2. COMMUNITY NAVBAR */}
-      <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200">
-        <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4 w-full">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group shrink-0">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <span className="font-serif font-bold text-lg sm:text-xl tracking-tight text-stone-900 dark:text-stone-100">
+              <span className="font-serif font-bold text-base sm:text-xl tracking-tight text-stone-900 dark:text-stone-100">
                 Katharos
               </span>
               <span className="hidden sm:inline-block ml-2 text-[10px] font-sans font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
@@ -335,7 +324,7 @@ export default function Home() {
           </Link>
 
           {/* Nav Links & CTA */}
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <a
               href="#renungan"
               className="hidden md:inline-block text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 transition-colors"
@@ -362,10 +351,10 @@ export default function Home() {
             <GoogleAuthButton />
 
             {/* Quick Theme Toggle */}
-            <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full p-0.5 border border-stone-200 dark:border-stone-700">
+            <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full p-0.5 border border-stone-200 dark:border-stone-700 shrink-0">
               <button
                 onClick={() => setTheme('light')}
-                className={`p-1.5 rounded-full text-xs transition-colors ${
+                className={`p-1 sm:p-1.5 rounded-full text-xs transition-colors ${
                   theme === 'light' ? 'bg-white text-amber-600 shadow-xs' : 'text-stone-400 hover:text-stone-700'
                 }`}
                 title="Mode Terang"
@@ -374,7 +363,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setTheme('sepia')}
-                className={`p-1.5 rounded-full text-xs transition-colors ${
+                className={`hidden sm:inline-flex p-1.5 rounded-full text-xs transition-colors ${
                   theme === 'sepia' ? 'bg-[#f4ecd8] text-amber-900 shadow-xs' : 'text-stone-400 hover:text-stone-700'
                 }`}
                 title="Mode Sepia"
@@ -383,7 +372,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setTheme('dark')}
-                className={`p-1.5 rounded-full text-xs transition-colors ${
+                className={`p-1 sm:p-1.5 rounded-full text-xs transition-colors ${
                   theme === 'dark' ? 'bg-stone-700 text-amber-400 shadow-xs' : 'text-stone-400 hover:text-stone-300'
                 }`}
                 title="Mode Gelap"
@@ -427,7 +416,7 @@ export default function Home() {
       </section>
 
       {/* 4. MAIN CONTENT: RENUNGAN & AGENDA */}
-      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 py-8 sm:py-14 space-y-10 sm:space-y-16">
+      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 py-8 sm:py-14 space-y-10 sm:space-y-16 w-full overflow-x-hidden">
         
         {/* SECTION: RENUNGAN HARI INI */}
         <section id="renungan" className="scroll-mt-24">
@@ -686,7 +675,7 @@ export default function Home() {
           </div>
 
           {/* Carousel Viewport with Fade Edges */}
-          <div className="relative -mx-3.5 sm:mx-0">
+          <div className="relative w-full overflow-hidden">
             {/* Left Edge Gradient Fade */}
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 sm:w-10 bg-gradient-to-r from-[#fafaf9] dark:from-[#121212] to-transparent z-10 hidden sm:block" />
             
@@ -695,7 +684,7 @@ export default function Home() {
 
             <div
               ref={carouselRef}
-              className="flex gap-3 sm:gap-4 overflow-x-auto scroll-smooth py-3 px-3.5 sm:px-1 snap-x snap-mandatory scrollbar-none sm:scrollbar-thin scrollbar-thumb-stone-300 dark:scrollbar-thumb-stone-700"
+              className="flex gap-3 sm:gap-4 overflow-x-auto scroll-smooth py-3 px-1 snap-x snap-mandatory scrollbar-none sm:scrollbar-thin scrollbar-thumb-stone-300 dark:scrollbar-thumb-stone-700"
             >
               {monthDevotionals.map((item) => {
                 const isToday = item.publish_date === todayPublishDate;
