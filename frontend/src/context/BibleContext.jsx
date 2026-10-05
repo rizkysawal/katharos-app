@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { fetchTranslations, fetchBooks, fetchChapter } from '../services/api';
 
 const BibleContext = createContext(null);
@@ -13,10 +14,13 @@ const DEFAULT_SETTINGS = {
 };
 
 export function BibleProvider({ children }) {
+  const location = useLocation();
+
   // Navigation & Data State
   const [currentTranslation, setCurrentTranslation] = useState('TB');
   const [currentBook, setCurrentBook] = useState('GEN');
   const [currentChapter, setCurrentChapter] = useState(1);
+  const [targetVerse, setTargetVerse] = useState(null);
 
   const [translations, setTranslations] = useState([]);
   const [books, setBooks] = useState([]);
@@ -128,12 +132,35 @@ export function BibleProvider({ children }) {
     loadChapter(currentBook, currentChapter, currentTranslation);
   }, [currentBook, currentChapter, currentTranslation, loadChapter]);
 
+  // Handle URL query parameters (?book=...&chapter=...&verse=...)
+  useEffect(() => {
+    if (location.pathname === '/read' && location.search) {
+      const params = new URLSearchParams(location.search);
+      const paramBook = params.get('book');
+      const paramChapter = params.get('chapter');
+      const paramVerse = params.get('verse');
+
+      if (paramBook && paramBook.toUpperCase() !== currentBook) {
+        setCurrentBook(paramBook.toUpperCase());
+      }
+      if (paramChapter && Number(paramChapter) !== currentChapter) {
+        setCurrentChapter(Number(paramChapter));
+      }
+      if (paramVerse) {
+        setTargetVerse(Number(paramVerse));
+      }
+    }
+  }, [location.pathname, location.search, currentBook, currentChapter]);
+
   // Navigate to specific book and chapter
-  const navigateTo = (bookCode, chapterNum) => {
+  const navigateTo = (bookCode, chapterNum, verseNum = null) => {
     setCurrentBook(bookCode);
     setCurrentChapter(Number(chapterNum));
+    setTargetVerse(verseNum ? Number(verseNum) : null);
     setIsPickerOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!verseNum) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Switch translation
@@ -216,6 +243,8 @@ export function BibleProvider({ children }) {
         setVerseHighlight,
         showToast,
         updateSettings,
+        targetVerse,
+        setTargetVerse,
       }}
     >
       {children}

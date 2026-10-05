@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   fetchTodayDevotional,
@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   X,
   ExternalLink,
+  ChevronLeft,
   ChevronRight,
   Sun,
   Moon,
@@ -25,19 +26,28 @@ import {
   ArrowRight,
   CheckCircle2,
   Quote,
+  Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import { parsePassageRef } from '../utils/bibleReference';
+import { FALLBACK_OCTOBER_DEVOTIONALS } from '../data/fallbackDevotionals';
 
 const STORAGE_BOOKMARKS = 'katharos_bookmarked_devotionals';
 
 export default function Home() {
   const [devotional, setDevotional] = useState(null);
   const [events, setEvents] = useState([]);
+  const [monthDevotionals, setMonthDevotionals] = useState([]);
+  const [todayPublishDate, setTodayPublishDate] = useState('2026-10-05');
   const [isLoading, setIsLoading] = useState(true);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [fontSizeIndex, setFontSizeIndex] = useState(1); // 0: base, 1: lg, 2: xl, 3: 2xl
   const [bookmarked, setBookmarked] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  const carouselRef = useRef(null);
+  const todayCardRef = useRef(null);
 
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -55,17 +65,31 @@ export default function Home() {
     localStorage.setItem('katharos_theme', theme);
   }, [theme]);
 
-  // Load Devotional & Events
+  // Load Devotional, Events & Month Devotionals Archive
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [devoData, eventsData] = await Promise.all([
+        const [devoData, eventsData, archiveData] = await Promise.all([
           fetchTodayDevotional(),
           fetchUpcomingEvents(),
+          fetchDevotionalsArchive(10, 2026),
         ]);
         setDevotional(devoData);
         setEvents(eventsData);
+
+        const actualToday = devoData?.publish_date || '2026-10-05';
+        setTodayPublishDate(actualToday);
+
+        const rawArchive = Array.isArray(archiveData) && archiveData.length > 0
+          ? archiveData
+          : FALLBACK_OCTOBER_DEVOTIONALS;
+
+        // Sort chronologically: day 1 to day 31
+        const sorted = [...rawArchive].sort(
+          (a, b) => new Date(a.publish_date).getTime() - new Date(b.publish_date).getTime()
+        );
+        setMonthDevotionals(sorted);
 
         // Check if bookmarked
         if (devoData && devoData.id) {
@@ -74,12 +98,27 @@ export default function Home() {
         }
       } catch (err) {
         console.error('Failed to load community data:', err);
+        setMonthDevotionals(FALLBACK_OCTOBER_DEVOTIONALS);
       } finally {
         setIsLoading(false);
       }
     }
     loadData();
   }, []);
+
+  // Auto-center horizontal carousel on today's devotional card
+  useEffect(() => {
+    if (monthDevotionals.length > 0 && todayCardRef.current && carouselRef.current) {
+      const timer = setTimeout(() => {
+        todayCardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest',
+        });
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [monthDevotionals]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -129,6 +168,66 @@ export default function Home() {
     } catch {
       return dateString;
     }
+  };
+
+  const formatShortCardDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const d = new Date(dateString);
+      return d.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatCardDayName = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const d = new Date(dateString);
+      return d.toLocaleDateString('id-ID', {
+        weekday: 'short',
+      });
+    } catch {
+      return '';
+    }
+  };
+
+  // Carousel actions
+  const handleScrollCarousel = (direction) => {
+    if (!carouselRef.current) return;
+    const scrollAmount = direction === 'left' ? -320 : 320;
+    carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
+
+  const handleSelectDevotional = (item) => {
+    setDevotional(item);
+    if (item && item.id) {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_BOOKMARKS) || '[]');
+      setBookmarked(saved.includes(item.id));
+    }
+    const renunganSection = document.getElementById('renungan');
+    if (renunganSection) {
+      renunganSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleResetToToday = () => {
+    const todayItem = monthDevotionals.find((d) => d.publish_date === todayPublishDate);
+    if (todayItem) {
+      setDevotional(todayItem);
+      if (todayItem.id) {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_BOOKMARKS) || '[]');
+        setBookmarked(saved.includes(todayItem.id));
+      }
+    }
+    todayCardRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
   };
 
   const formatEventTime = (startTime, endTime) => {
@@ -402,28 +501,32 @@ export default function Home() {
                 </div>
 
                 {/* 3. AYAT (Passage Reference & Text) */}
-                {devotional.passage_ref && (
-                  <div className="rounded-2xl p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 mb-6">
-                    <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span>Bacaan Alkitab</span>
-                      </span>
-                      <Link
-                        to="/read"
-                        className="text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1"
-                      >
-                        <span>{devotional.passage_ref}</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
+                {devotional.passage_ref && (() => {
+                  const target = parsePassageRef(devotional.passage_ref);
+                  return (
+                    <div className="rounded-2xl p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 mb-6">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Bacaan Alkitab</span>
+                        </span>
+                        <Link
+                          to={target.url}
+                          className="text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1 group/ref"
+                          title={`Buka Alkitab ${devotional.passage_ref}`}
+                        >
+                          <span>{devotional.passage_ref}</span>
+                          <ChevronRight className="w-3.5 h-3.5 group-hover/ref:translate-x-0.5 transition-transform" />
+                        </Link>
+                      </div>
+                      {devotional.passage_text && (
+                        <p className="font-serif text-sm sm:text-base italic text-stone-700 dark:text-stone-300 leading-relaxed">
+                          "{devotional.passage_text}"
+                        </p>
+                      )}
                     </div>
-                    {devotional.passage_text && (
-                      <p className="font-serif text-sm sm:text-base italic text-stone-700 dark:text-stone-300 leading-relaxed">
-                        "{devotional.passage_text}"
-                      </p>
-                    )}
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* 4. JUDUL RENUNGAN (Title) */}
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100 leading-tight mb-6">
@@ -503,13 +606,19 @@ export default function Home() {
                   </button>
                 </div>
 
-                <Link
-                  to="/read"
-                  className="text-xs font-semibold text-stone-500 hover:text-amber-600 dark:text-stone-400 dark:hover:text-amber-400 flex items-center gap-1 ml-auto"
-                >
-                  <span>Lanjut baca di Alkitab Reader</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                {(() => {
+                  const target = parsePassageRef(devotional?.passage_ref);
+                  return (
+                    <Link
+                      to={target.url}
+                      className="text-xs font-semibold text-stone-500 hover:text-amber-600 dark:text-stone-400 dark:hover:text-amber-400 flex items-center gap-1 ml-auto group/goto"
+                      title={devotional?.passage_ref ? `Lanjut baca ${devotional.passage_ref} di Alkitab Reader` : 'Buka Alkitab Reader'}
+                    >
+                      <span>Lanjut baca di Alkitab Reader</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/goto:translate-x-0.5 transition-transform" />
+                    </Link>
+                  );
+                })()}
               </div>
 
               </div>
@@ -519,6 +628,168 @@ export default function Home() {
               Belum ada renungan untuk hari ini.
             </div>
           )}
+        </section>
+
+        {/* SECTION: KALENDER & SCROLL HORIZONTAL RENUNGAN SEBULAN */}
+        <section id="kalender-renungan" className="scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500 mb-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Katalog Santapan Rohani Sebulan</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100">
+                Renungan Sepanjang Bulan Ini
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mt-1">
+                Jelajahi firman Tuhan sebelum dan sesudah hari ini. Renungan hari ini berada di posisi tengah sebagai fokus utama.
+              </p>
+            </div>
+
+            {/* Controls: Reset to Today & Carousel Scroll Arrows */}
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              {devotional?.publish_date !== todayPublishDate && (
+                <button
+                  onClick={handleResetToToday}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-all active:scale-95 shadow-xs"
+                  title="Kembali ke Renungan Hari Ini"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Kembali ke Hari Ini</span>
+                </button>
+              )}
+
+              <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-full border border-stone-200 dark:border-stone-700">
+                <button
+                  onClick={() => handleScrollCarousel('left')}
+                  className="p-1.5 rounded-full hover:bg-white dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors"
+                  title="Geser Renungan Sebelumnya"
+                  aria-label="Geser ke kiri"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleScrollCarousel('right')}
+                  className="p-1.5 rounded-full hover:bg-white dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors"
+                  title="Geser Renungan Selanjutnya"
+                  aria-label="Geser ke kanan"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Carousel Viewport with Fade Edges */}
+          <div className="relative">
+            {/* Left Edge Gradient Fade */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-r from-[#fafaf9] dark:from-[#121212] to-transparent z-10 hidden sm:block" />
+            
+            {/* Right Edge Gradient Fade */}
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-l from-[#fafaf9] dark:from-[#121212] to-transparent z-10 hidden sm:block" />
+
+            <div
+              ref={carouselRef}
+              className="flex gap-4 overflow-x-auto scroll-smooth py-3 px-1 sm:px-2 snap-x scrollbar-thin scrollbar-thumb-stone-300 dark:scrollbar-thumb-stone-700 -mx-4 sm:mx-0 px-4 sm:px-1"
+            >
+              {monthDevotionals.map((item) => {
+                const isToday = item.publish_date === todayPublishDate;
+                const isActive = devotional && (devotional.id === item.id || devotional.publish_date === item.publish_date);
+
+                return (
+                  <div
+                    key={item.id || item.publish_date}
+                    ref={isToday ? todayCardRef : null}
+                    onClick={() => handleSelectDevotional(item)}
+                    className={`w-64 sm:w-72 shrink-0 snap-center rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden flex flex-col justify-between select-none group ${
+                      isActive
+                        ? 'ring-2 ring-amber-500 border-amber-400 bg-amber-50/50 dark:bg-amber-950/40 shadow-lg scale-[1.02]'
+                        : isToday
+                        ? 'border-amber-400/80 bg-white dark:bg-stone-900 shadow-md hover:border-amber-500 hover:shadow-lg'
+                        : 'border-stone-200/80 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-700 hover:shadow-md hover:-translate-y-0.5'
+                    }`}
+                  >
+                    <div>
+                      {/* Image Thumbnail */}
+                      <div className="relative h-32 w-full overflow-hidden bg-stone-100 dark:bg-stone-800">
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-stone-400">
+                            <BookOpen className="w-8 h-8 opacity-40" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+                        {/* Floating Date Badge (Top Left) */}
+                        <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg backdrop-blur-md bg-stone-950/70 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
+                          <span className="text-[10px] text-amber-400 uppercase font-semibold">
+                            {formatCardDayName(item.publish_date)}
+                          </span>
+                          <span>{formatShortCardDate(item.publish_date)}</span>
+                        </div>
+
+                        {/* Status Badge (Top Right) */}
+                        <div className="absolute top-2.5 right-2.5">
+                          {isToday ? (
+                            <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-stone-950 font-extrabold text-[10px] uppercase tracking-wider shadow-md animate-pulse">
+                              ✨ Hari Ini
+                            </span>
+                          ) : isActive ? (
+                            <span className="px-2 py-0.5 rounded-full bg-white/90 text-stone-900 font-bold text-[10px] shadow-sm">
+                              Aktif
+                            </span>
+                          ) : null}
+                        </div>
+
+                        {/* Passage Ref overlay at bottom of image */}
+                        {item.passage_ref && (
+                          <div className="absolute bottom-2 left-2.5 right-2.5 text-white/95 text-[11px] font-medium truncate flex items-center gap-1">
+                            <BookOpen className="w-3 h-3 text-amber-300 shrink-0" />
+                            <span className="truncate">{item.passage_ref}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Body */}
+                      <div className="p-4">
+                        <h4 className="font-serif font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-2 leading-snug mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                          {item.title}
+                        </h4>
+                        <div className="text-[11px] text-stone-500 dark:text-stone-400">
+                          Oleh: <span className="font-medium text-stone-700 dark:text-stone-300">{item.author || 'Tim Katharos'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer CTA */}
+                    <div
+                      className={`px-4 py-2 text-xs font-semibold flex items-center justify-between border-t transition-colors ${
+                        isActive
+                          ? 'bg-amber-100/60 dark:bg-amber-950/60 border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-300 font-bold'
+                          : 'bg-stone-50 dark:bg-stone-800/40 border-stone-100 dark:border-stone-800 text-stone-600 dark:text-stone-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'
+                      }`}
+                    >
+                      <span>{isActive ? 'Sedang Dibaca' : 'Baca Renungan Ini'}</span>
+                      {isActive ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </section>
 
         {/* SECTION: AGENDA KEGIATAN TERDEKAT */}

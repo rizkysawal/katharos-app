@@ -14,7 +14,21 @@ export default function ReaderView() {
     highlights,
     settings,
     toggleVerseSelection,
+    targetVerse,
   } = useBible();
+
+  // Scroll to target verse when chapterData loads
+  React.useEffect(() => {
+    if (targetVerse && chapterData && !isLoading) {
+      const timer = setTimeout(() => {
+        const verseEl = document.getElementById(`verse-${targetVerse}`);
+        if (verseEl) {
+          verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [targetVerse, chapterData, isLoading]);
 
   // Font size mapping
   const fontSizeClasses = {
@@ -85,6 +99,7 @@ export default function ReaderView() {
             <div className="space-y-3 sm:space-y-4">
               {verses.map((verse) => {
                 const isSelected = selectedVerses.includes(verse.verse_number);
+                const isTarget = targetVerse && Number(targetVerse) === Number(verse.verse_number);
                 const highlightKey = `${currentBook}_${currentChapter}_${verse.verse_number}`;
                 const highlightColor = highlights[highlightKey];
 
@@ -96,15 +111,22 @@ export default function ReaderView() {
                 return (
                   <span
                     key={verse.id || verse.verse_number}
+                    id={`verse-${verse.verse_number}`}
                     onClick={() => toggleVerseSelection(verse.verse_number)}
-                    className={`inline-block mr-2 cursor-pointer transition-all duration-150 rounded-lg p-1 -m-1 hover:bg-stone-100/70 dark:hover:bg-stone-800/40 ${
-                      isSelected
+                    className={`inline-block mr-2 cursor-pointer transition-all duration-200 rounded-lg p-1 -m-1 hover:bg-stone-100/70 dark:hover:bg-stone-800/40 ${
+                      isTarget
+                        ? 'ring-2 ring-amber-500 bg-amber-100/90 dark:bg-amber-950/70 shadow-sm font-medium'
+                        : isSelected
                         ? 'ring-2 ring-amber-500 bg-amber-50 dark:bg-amber-950/30'
                         : ''
                     }`}
                   >
                     {/* Superscript Verse Number */}
-                    <sup className="select-none text-[11px] font-sans font-bold text-amber-700/70 dark:text-amber-500/70 mr-1.5 align-super">
+                    <sup className={`select-none text-[11px] font-sans font-bold mr-1.5 align-super ${
+                      isTarget
+                        ? 'text-amber-700 dark:text-amber-400 underline'
+                        : 'text-amber-700/70 dark:text-amber-500/70'
+                    }`}>
                       {verse.verse_number}
                     </sup>
                     
