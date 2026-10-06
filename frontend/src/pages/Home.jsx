@@ -19,9 +19,6 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Sun,
-  Moon,
-  Coffee,
   CalendarPlus,
   ArrowRight,
   CheckCircle2,
@@ -30,6 +27,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import ThemeToggle from '../components/ThemeToggle';
 import { parsePassageRef } from '../utils/bibleReference';
 import { FALLBACK_OCTOBER_DEVOTIONALS } from '../data/fallbackDevotionals';
 
@@ -277,7 +275,7 @@ export default function Home() {
   const alertEvent = events.find((e) => e.is_alert);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf9] dark:bg-[#121212] text-stone-900 dark:text-stone-100 transition-colors duration-200 w-full overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-[#fafaf9] dark:bg-[#121212] text-stone-900 dark:text-stone-100 transition-colors duration-200 w-full overflow-x-clip">
       
       {/* 1. TOP ALERT BANNER (If any upcoming event has is_alert = true) */}
       {alertEvent && !alertDismissed && (
@@ -305,81 +303,62 @@ export default function Home() {
       )}
 
       {/* 2. COMMUNITY NAVBAR */}
-      <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4 w-full">
-          
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
+      {/* NOTE: no overflow-hidden here — it would clip the profile dropdown & login modal. */}
+      <header className="sticky top-0 z-30 w-full pt-[env(safe-area-inset-top)] backdrop-blur-md bg-[#fafaf9]/90 dark:bg-[#121212]/90 border-b border-stone-200 dark:border-stone-800 transition-colors duration-200">
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4 w-full">
+
+          {/* Logo (allowed to shrink so the actions never overflow) */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 group min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+            aria-label="Katharos — Beranda"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <span className="font-serif font-bold text-base sm:text-xl tracking-tight text-stone-900 dark:text-stone-100">
+            <div className="flex items-center min-w-0">
+              <span className="font-serif font-bold text-base sm:text-xl tracking-tight text-stone-900 dark:text-stone-100 truncate">
                 Katharos
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[10px] font-sans font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
+              <span className="hidden lg:inline-block ml-2 text-[10px] font-sans font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 whitespace-nowrap">
                 Komunitas & Firman
               </span>
             </div>
           </Link>
 
-          {/* Nav Links & CTA */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            <a
-              href="#renungan"
-              className="hidden md:inline-block text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 transition-colors"
-            >
-              Renungan
-            </a>
-            <a
-              href="#agenda"
-              className="hidden md:inline-block text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 transition-colors"
-            >
-              Agenda PMK
-            </a>
+          {/* Nav Links & Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <nav aria-label="Navigasi halaman" className="hidden md:flex items-center gap-1 mr-1">
+              {[
+                { href: '#renungan', label: 'Renungan' },
+                { href: '#kalender-renungan', label: 'Arsip' },
+                { href: '#agenda', label: 'Agenda PMK' },
+              ].map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-700 dark:hover:text-amber-400 hover:bg-stone-100 dark:hover:bg-stone-800/70 px-3 py-1.5 rounded-full transition-colors"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
 
             {/* Direct Link to Bible Reader /read */}
             <Link
               to="/read"
-              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm shadow-sm transition-all duration-150 active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-3 sm:px-3.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs sm:text-sm shadow-sm shadow-amber-600/20 transition-all duration-150 active:scale-95"
+              aria-label="Buka Alkitab"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-4 h-4 shrink-0" />
               <span className="hidden xs:inline">Alkitab</span>
             </Link>
 
             {/* Google Authentication Button for Members (Jemaat) */}
             <GoogleAuthButton />
 
-            {/* Quick Theme Toggle */}
-            <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full p-0.5 border border-stone-200 dark:border-stone-700 shrink-0">
-              <button
-                onClick={() => setTheme('light')}
-                className={`p-1 sm:p-1.5 rounded-full text-xs transition-colors ${
-                  theme === 'light' ? 'bg-white text-amber-600 shadow-xs' : 'text-stone-400 hover:text-stone-700'
-                }`}
-                title="Mode Terang"
-              >
-                <Sun className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setTheme('sepia')}
-                className={`hidden sm:inline-flex p-1.5 rounded-full text-xs transition-colors ${
-                  theme === 'sepia' ? 'bg-[#f4ecd8] text-amber-900 shadow-xs' : 'text-stone-400 hover:text-stone-700'
-                }`}
-                title="Mode Sepia"
-              >
-                <Coffee className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={`p-1 sm:p-1.5 rounded-full text-xs transition-colors ${
-                  theme === 'dark' ? 'bg-stone-700 text-amber-400 shadow-xs' : 'text-stone-400 hover:text-stone-300'
-                }`}
-                title="Mode Gelap"
-              >
-                <Moon className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            {/* Theme switcher (cycling button on mobile, segmented on sm+) */}
+            <ThemeToggle theme={theme} onChange={setTheme} />
           </div>
         </div>
       </header>
@@ -416,7 +395,7 @@ export default function Home() {
       </section>
 
       {/* 4. MAIN CONTENT: RENUNGAN & AGENDA */}
-      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 py-8 sm:py-14 space-y-10 sm:space-y-16 w-full overflow-x-hidden">
+      <main className="max-w-4xl mx-auto px-3.5 sm:px-6 py-8 sm:py-14 space-y-10 sm:space-y-16 w-full overflow-x-clip">
         
         {/* SECTION: RENUNGAN HARI INI */}
         <section id="renungan" className="scroll-mt-24">
