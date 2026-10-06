@@ -32,9 +32,11 @@ export default function Header() {
           title="Kembali ke Beranda"
           aria-label="Kembali ke Beranda Katharos"
         >
-          <div className="w-8 h-8 rounded-lg bg-amber-600 dark:bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
-            <BookOpen className="w-4 h-4" />
-          </div>
+          <img
+            src="/favicon.svg"
+            alt="Logo Katharos"
+            className="w-8 h-8 object-contain rounded-lg shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0"
+          />
           <span className="hidden md:inline font-serif font-bold text-lg tracking-tight text-stone-900 dark:text-stone-100">
             Katharos
           </span>
